@@ -15,4 +15,10 @@ public class TaskContract {
 
         public static final String COL_TASK_TITLE = "title";
     }
+
+    public class DayEntry implements BaseColumns {
+        public static final String TABLE = "days";
+
+        public static final String COL_DAY_TITLE = "title";
+    }
 }
