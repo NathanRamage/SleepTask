@@ -16,15 +16,24 @@ public class TaskDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String createTable = "CREATE TABLE " + TaskContract.TaskEntry.TABLE + " ( " +
+        String createTaskTable = "CREATE TABLE " + TaskContract.TaskEntry.TABLE + " ( " +
                 TaskContract.TaskEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL);";
-        db.execSQL(createTable);
+                TaskContract.TaskEntry.COL_TASK_TITLE + " TEXT NOT NULL," +
+                TaskContract.TaskEntry.COL_DAY_TITLE + " TEXT NOT NULL," +
+                TaskContract.TaskEntry.COL_IMPORTANT + " BOOLEAN NOT NULL DEFAULT 0," +
+                TaskContract.TaskEntry.COL_START_TIME + " INT NOT NULL," +
+                TaskContract.TaskEntry.COL_DURATION + " INT NOT NULL);";
+        db.execSQL(createTaskTable);
+
+        String createDaysTable = "CREATE TABLE " + TaskContract.DayEntry.TABLE + " ( " +
+                TaskContract.DayEntry.COL_DAY_TITLE + " TEXT PRIMARY KEY);";
+        db.execSQL(createDaysTable);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TaskContract.TaskEntry.TABLE);
+        db.execSQL("DROP TABLE IF EXISTS " + TaskContract.DayEntry.TABLE);
         onCreate(db);
     }
 }

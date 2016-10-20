@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">SleepTask</string>
+    <string-array name="task_list">
+        <item>Watch TV</item>
+        <item>Eat Dinner</item>
+        <item>Do Homework</item>
+        <item>Playing Games</item>
+        <item>Bath/Shower</item>
+        <item>Browse Internet</item>
+    </string-array>
 </resources>

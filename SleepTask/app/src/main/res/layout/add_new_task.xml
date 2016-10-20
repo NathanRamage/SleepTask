@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <Spinner
+        android:id="@+id/task_chooser"
+        android:layout_width="250sp"
+        android:layout_height="wrap_content"
+        android:entries="@array/task_list"
+        android:layout_centerHorizontal="true"
+        android:textAlignment="center"
+        android:textSize="40sp"
+        android:padding="5dip"></Spinner>
+    <!--<TextView
+        android:id="@+id/or"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="OR"
+        android:layout_toRightOf="@id/task_chooser"
+        android:layout_alignBottom="@id/task_chooser"
+        android:textSize="20sp"/>
+    <EditText
+        android:id="@+id/add_new_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/or"
+        android:width="150sp"
+        android:layout_marginLeft="20sp"
+        android:layout_alignBaseline="@id/or"
+        android:layout_alignParentRight="true"
+        android:hint="Add New Task"
+        android:textAlignment="center"/>-->
+    <!--<LinearLayout
+        android:id="@+id/btns"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/task_chooser"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+-->
+        <Button
+            android:id="@+id/btn_add_duation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Duration"
+            android:onClick="set_duration"
+            android:layout_below="@id/task_chooser"
+            android:layout_centerHorizontal="true"
+            android:layout_alignStart="@id/task_chooser"
+            android:layout_alignLeft="@id/task_chooser" />
+        <Button
+            android:id="@+id/btn_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set Time"
+            android:onClick="set_time"
+            android:layout_below="@id/task_chooser"
+            android:layout_alignEnd="@id/task_chooser"
+            android:layout_alignRight="@id/task_chooser" />
+    <!--</LinearLayout>-->
+    <CheckBox
+        android:id="@+id/important_task"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btn_time"
+        android:text="High Prority"
+        android:layout_centerHorizontal="true"
+        android:layout_alignStart="@id/btn_add_duation"
+        android:layout_alignLeft="@id/btn_add_duation" />
+
+</RelativeLayout>
