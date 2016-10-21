@@ -8,7 +8,7 @@ import android.provider.BaseColumns;
 
 public class TaskContract {
     public static final String DB_NAME = "com.example.nathan.sleeptask.db";
-    public static final int DB_VERSION = 3;
+    public static final int DB_VERSION = 4;
 
     public class TaskEntry implements BaseColumns {
         public static final String TABLE = "tasks";
@@ -24,5 +24,6 @@ public class TaskContract {
         public static final String TABLE = "days";
 
         public static final String COL_DAY_TITLE = "title";
+        public static final String COL_BED_TIME = "bed_time";
     }
 }

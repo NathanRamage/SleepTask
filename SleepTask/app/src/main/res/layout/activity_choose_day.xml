@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+        <Spinner
+            android:id="@+id/day_select"
+            android:layout_width="250sp"
+            android:layout_height="wrap_content"
+            android:entries="@array/days"
+            android:textAlignment="center"
+            android:paddingLeft="45sp">
+        </Spinner>
+
+        <Button
+            android:id="@+id/set_bed_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/day_select"
+            android:text="Set Time"
+            android:onClick="set_bed_time"/>
+        <Button
+            android:id="@+id/start_task"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/day_select"
+            android:text="Start"
+            android:layout_alignRight="@id/day_select"
+            android:layout_alignEnd="@id/day_select"
+            android:onClick="startTasks"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/group"
+        android:layout_centerHorizontal="true">
+        <TextView
+            android:id="@+id/bed_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Set bed time: "
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:layout_marginTop="100sp"></TextView>
+
+        <TextView
+            android:id="@+id/bed_time_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Not Set"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="100sp"
+            android:layout_toRightOf="@id/bed_label"
+            android:layout_marginLeft="15sp"></TextView>
+    </RelativeLayout>
+
+</RelativeLayout>
