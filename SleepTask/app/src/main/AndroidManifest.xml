@@ -15,6 +15,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".MainActivity">
+
+        </activity>
+        <receiver android:name=".processTimerReceiver">
+            <intent-filter>
+                <action android:name="processTimerReceiver">
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
