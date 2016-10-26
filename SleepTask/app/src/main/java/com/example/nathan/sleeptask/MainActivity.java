@@ -1,6 +1,5 @@
 package com.example.nathan.sleeptask;
 
-import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.Dialog;
 import android.app.PendingIntent;
@@ -11,46 +10,30 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
-import android.media.Image;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.NumberPicker;
-import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.example.nathan.sleeptask.db.TaskContract;
 import com.example.nathan.sleeptask.db.TaskDbHelper;
 
-import android.text.format.DateFormat;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
-
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -61,14 +44,15 @@ public class MainActivity extends AppCompatActivity {
     public static int time;
     private static int duration;
     private static String day;
+    private List<Integer> ids;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Bundle b = getIntent().getExtras();
-        if (b != null)
-        {
+        ids = new ArrayList<>();
+        if (b != null) {
             day = b.getString("Day");
             Toast.makeText(this, "Day is " + day, Toast.LENGTH_SHORT).show();
         }
@@ -107,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
                 View dialogView = inflater.inflate(R.layout.add_new_task, null);
                 final Spinner spinner = (Spinner) dialogView.findViewById(R.id.task_chooser);
                 final CheckBox importantTask = (CheckBox) dialogView.findViewById(R.id.important_task);
-                //final EditText newTask = (EditText) dialogView.findViewById(R.id.add_new_task);
                 AlertDialog dialog = new AlertDialog.Builder(this)
                         .setTitle("Add a new task")
                         .setMessage("What do you want to do next?")
@@ -144,10 +127,12 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> taskList = new ArrayList<>();
         List<RowItem> rowItems = new ArrayList<RowItem>();
         SQLiteDatabase db = mHelper.getReadableDatabase();
+        ids = new ArrayList<>();
         try {
 
-            Cursor cursor = db.query(TaskContract.TaskEntry.TABLE, null,TaskContract.TaskEntry.COL_DAY_TITLE + "=?", new String[]{day}, null, null, TaskContract.TaskEntry.COL_START_TIME + " ASC");
+            Cursor cursor = db.query(TaskContract.TaskEntry.TABLE, null, TaskContract.TaskEntry.COL_DAY_TITLE + "=?", new String[]{day}, null, null, TaskContract.TaskEntry.COL_START_TIME + " ASC");
             while (cursor.moveToNext()) {
+                int id = cursor.getColumnIndex(TaskContract.TaskEntry._ID);
                 int title = cursor.getColumnIndex(TaskContract.TaskEntry.COL_TASK_TITLE);
                 int isImportant = cursor.getColumnIndex(TaskContract.TaskEntry.COL_IMPORTANT);
                 int startTime = cursor.getColumnIndex(TaskContract.TaskEntry.COL_START_TIME);
@@ -159,11 +144,12 @@ public class MainActivity extends AppCompatActivity {
                     int backgroundColor = checkTaskTime(cursor.getInt(startTime), cursor.getInt(duration));
                     RowItem item = new RowItem(R.drawable.important, cursor.getString(title), backgroundColor);
                     rowItems.add(item);
-                }
-                else {
+                    ids.add(cursor.getInt(id));
+                } else {
                     int backgroundColor = checkTaskTime(cursor.getInt(startTime), cursor.getInt(duration));
                     RowItem item = new RowItem(R.drawable.transparent, cursor.getString(title), backgroundColor);
                     rowItems.add(item);
+                    ids.add(cursor.getInt(id));
                 }
             }
 
@@ -171,8 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     R.layout.item_task, rowItems);
             mTaskListView.setAdapter(adapter);
             cursor.close();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             Toast.makeText(this, "No tasks added yet", Toast.LENGTH_SHORT).show();
             Cursor cursor = db.query(TaskContract.TaskEntry.TABLE, null, null, null, null, null, null);
             while (cursor.moveToNext()) {
@@ -186,28 +171,28 @@ public class MainActivity extends AppCompatActivity {
     private int checkTaskTime(int startTime, int duration) {
         Calendar c = Calendar.getInstance();
 
-        int hours = c.get(Calendar.HOUR_OF_DAY);
+        int hours = c.get(Calendar.HOUR_OF_DAY) * 100;
         int minutes = c.get(Calendar.MINUTE);
+
+        Log.d(TAG, "Time: " + c.get(Calendar.HOUR_OF_DAY));
 
         if (startTime + duration < hours + minutes) {
             return Color.GREEN;
-        }
-        else if (startTime < hours + minutes) {
+        } else if (startTime < hours + minutes) {
             return Color.YELLOW;
-        }
-        else {
+        } else {
             return Color.WHITE;
         }
     }
 
     public void deleteTask(View view) {
         View parent = (View) view.getParent();
-        TextView taskTextView = (TextView) parent.findViewById(R.id.task_title);
-        String task = String.valueOf(taskTextView.getText());
+        ListView listView = (ListView) parent.getParent();
+        final int position = listView.getPositionForView(parent);
         SQLiteDatabase db = mHelper.getReadableDatabase();
         db.delete(TaskContract.TaskEntry.TABLE,
-                TaskContract.TaskEntry.COL_TASK_TITLE + " = ?",
-                new String[] {task});
+                TaskContract.TaskEntry._ID + " = ?",
+                new String[]{ids.get(position).toString()});
         db.close();
         UpdateUI();
     }
@@ -222,12 +207,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void NumberPickerDialog() {
-        final NumberPicker numberPicker =  new NumberPicker(this);
+        final NumberPicker numberPicker = new NumberPicker(this);
         numberPicker.setMinValue(1);
         numberPicker.setMaxValue(60);
         NumberPicker.OnValueChangeListener valueChangedListener = new NumberPicker.OnValueChangeListener() {
             @Override
-            public void onValueChange( NumberPicker picker, int oldVal, int newVal) {
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal) {
                 duration = newVal;
             }
         };

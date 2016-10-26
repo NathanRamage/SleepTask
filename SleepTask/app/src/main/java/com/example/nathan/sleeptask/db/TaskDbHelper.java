@@ -26,7 +26,7 @@ public class TaskDbHelper extends SQLiteOpenHelper {
         db.execSQL(createTaskTable);
 
         String createDaysTable = "CREATE TABLE " + TaskContract.DayEntry.TABLE + " ( " +
-                TaskContract.DayEntry.COL_DAY_TITLE + " TEXT PRIMARY KEY," +
+                TaskContract.DayEntry.COL_DAY_TITLE + " TEXT NOT NULL," +
                 TaskContract.DayEntry.COL_BED_TIME + " INT NOT NULL);";
         db.execSQL(createDaysTable);
     }

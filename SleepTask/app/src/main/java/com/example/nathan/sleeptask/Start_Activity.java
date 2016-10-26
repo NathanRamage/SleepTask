@@ -3,6 +3,7 @@ package com.example.nathan.sleeptask;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -12,7 +13,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.format.DateFormat;
+import android.util.Log;
 import android.view.View;
+import android.widget.DatePicker;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -38,23 +42,23 @@ public class Start_Activity extends AppCompatActivity {
         setContentView(R.layout.activity_choose_day);
         mHelper = new TaskDbHelper(this);
 
-        try {
-            Spinner spinner = (Spinner) findViewById(R.id.day_select);
-            String day = spinner.getSelectedItem().toString();
-            SQLiteDatabase db = mHelper.getReadableDatabase();
-            Cursor cursor = db.query(TaskContract.DayEntry.TABLE, new String[]{TaskContract.DayEntry.COL_BED_TIME}, TaskContract.DayEntry.COL_DAY_TITLE + "=?", new String[]{day},
-                    null, null, null);
-            TextView tv = (TextView) findViewById(R.id.bed_time_label);
-            while (cursor.moveToNext()) {
-                tv.setText(cursor.getInt(cursor.getColumnIndex(TaskContract.DayEntry.COL_BED_TIME)));
-            }
-        }
-        catch (Exception e) {
-
+        Spinner spinner = (Spinner) findViewById(R.id.day_select);
+        String day = spinner.getSelectedItem().toString();
+        SQLiteDatabase db = mHelper.getReadableDatabase();
+        Cursor cursor = db.query(TaskContract.DayEntry.TABLE, null, TaskContract.DayEntry.COL_DAY_TITLE + "=?",
+                new String[] {day},
+                null, null, null);
+        TextView tv = (TextView) findViewById(R.id.bed_time_label);
+        while (cursor.moveToNext()) {
+            tv.setText(String.valueOf(cursor.getInt(cursor.getColumnIndex(TaskContract.DayEntry.COL_BED_TIME))));
+            Log.d("Start_Activity", "Day: " + cursor.getString(cursor.getColumnIndex(TaskContract.DayEntry.COL_DAY_TITLE)) + " Bed Time: "+
+                    cursor.getInt(cursor.getColumnIndex(TaskContract.DayEntry.COL_BED_TIME)));
         }
     }
 
     public void startTasks(View view) {
+        UpdateDbTable();
+        UpdateUI();
         Spinner spinner = (Spinner) findViewById(R.id.day_select);
         String day = spinner.getSelectedItem().toString();
         Intent start = new Intent(Start_Activity.this, MainActivity.class);
@@ -66,39 +70,59 @@ public class Start_Activity extends AppCompatActivity {
     }
 
     public void set_bed_time(View view) {
-        TimePickerFragment timePickerFragment = new TimePickerFragment();
-        timePickerFragment.show(getSupportFragmentManager(), "timePicker");
-        while( hasOpenedDialogs(this) ){};
-        updateDbTable();
-        UpdateUI();
-        Toast.makeText(this, "time: " + setTime, Toast.LENGTH_SHORT).show();
+        // TODO Auto-generated method stub
+        Calendar mcurrentTime = Calendar.getInstance();
+        int hour = mcurrentTime.get(Calendar.HOUR_OF_DAY);
+        int minute = mcurrentTime.get(Calendar.MINUTE);
+        TimePickerDialog mTimePicker = new TimePickerDialog(this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int selectedHour, int selectedMinute) {
+                setTime = (selectedHour * 100) + selectedMinute;
+            }
+        }, hour, minute, true);//Yes 24 hour time
+        mTimePicker.setTitle("Select Time");
+        mTimePicker.setButton(TimePickerDialog.BUTTON_POSITIVE, "OK",
+                new TimePickerDialog.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        UpdateDbTable();
+                        UpdateUI();
+                    }
+                });
+        mTimePicker.show();
     }
 
-    private void updateDbTable () {
+    public void UpdateDbTable () {
         Spinner dayChooser = (Spinner) findViewById(R.id.day_select);
         String day = dayChooser.getSelectedItem().toString();
         SQLiteDatabase db = mHelper.getReadableDatabase();
         try {
             Cursor cursor = db.query(TaskContract.DayEntry.TABLE,
-                    null, TaskContract.DayEntry.COL_DAY_TITLE + "=?", new String[]{day}, null, null, null);
+                    null, null, null, null, null, null);
             ContentValues cv = new ContentValues();
-            cv.put(TaskContract.DayEntry.COL_BED_TIME, setTime);
-            db.update(TaskContract.DayEntry.TABLE,
+            Log.d("Start_Activity", "Query ok");
+            cv.put(TaskContract.DayEntry.COL_BED_TIME, 2300);
+            /*db.update(TaskContract.DayEntry.TABLE,
                     cv,
                     TaskContract.DayEntry.COL_DAY_TITLE + "=" + day,
-                    null);
+                    null);*/
+            Log.d("Start_Activity", "Day: " + cursor.getString(cursor.getColumnIndex(TaskContract.DayEntry.COL_DAY_TITLE)));
+            cursor.moveToFirst();
+            while (cursor.moveToNext()) {
+                Log.d("Start_Activity", "Day: " + cursor.getString(cursor.getColumnIndex(TaskContract.DayEntry.COL_DAY_TITLE)) + " bed time: " + cursor.getInt(cursor.getColumnIndex(TaskContract.DayEntry.COL_BED_TIME)));
+            }
         } catch (Exception e) {
+            Log.d("Start_Activity", e.toString());
             ContentValues values = new ContentValues();
             values.put(TaskContract.DayEntry.COL_DAY_TITLE, day);
             values.put(TaskContract.DayEntry.COL_BED_TIME, setTime);
-            db.insertWithOnConflict(TaskContract.DayEntry.TABLE,
+            db.insert(TaskContract.DayEntry.TABLE,
                     null,
-                    values,
-                    SQLiteDatabase.CONFLICT_REPLACE);
+                    values);
         }
     }
 
-    private void UpdateUI() {
+    public void UpdateUI() {
         TextView bedTime = (TextView) findViewById(R.id.bed_time_label);
         bedTime.setText(String.valueOf(setTime));
     }
